@@ -13,6 +13,10 @@
 </head>
 <body>
 <h1>Product list</h1>
+<form action="/product" method="get">
+    <input type="text" placeholder="search" name="q">
+    <button>Search</button>
+</form>
 <a href="/product?action=create">Create new product</a>
 <table>
     <thead>

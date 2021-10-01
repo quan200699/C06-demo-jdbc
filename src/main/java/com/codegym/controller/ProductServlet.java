@@ -67,7 +67,15 @@ public class ProductServlet extends HttpServlet {
     }
 
     private void showProductList(HttpServletRequest request, HttpServletResponse response) {
-        List<Product> products = productService.getAll();
+        //Kiểm tra nếu parameter name tìm kiếm mà khác null => thì gọi hàm search
+        // = null => thì gọi hàm show list
+        String name = request.getParameter("q");
+        List<Product> products;
+        if (name == null || name.equals("")){
+            products = productService.getAll();
+        }else {
+            products = productService.findProductByName(name);
+        }
         RequestDispatcher dispatcher = request.getRequestDispatcher("/product/list.jsp");
         request.setAttribute("products", products);
         try {

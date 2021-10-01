@@ -84,4 +84,30 @@ public class ProductDao implements IProductDao {
         }
         return product;
     }
+
+    @Override
+    public List<Product> findProductByName(String name) {
+        // select * from product where name like %name%;
+        // select * from product where name like %?%; => sai
+        // select * from product where name like ?
+        // => truyền name => cộng chuỗi name = % + name + %
+        List<Product> products = new ArrayList<>();
+        try {
+            PreparedStatement statement = connection.prepareStatement("select * from product where name like ?");
+            statement.setString(1, name);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String name1 = resultSet.getString("name");
+                String description = resultSet.getString("description");
+                double price = resultSet.getDouble("price");
+                String image = resultSet.getString("image");
+                Product product = new Product(id, name1, description, price, image);
+                products.add(product);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return products;
+    }
 }
