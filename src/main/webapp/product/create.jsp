@@ -30,6 +30,13 @@
     <div>
         <input type="text" placeholder="product image" name="image">
     </div>
+    <div>
+        <select name="category" id="category">
+            <c:forEach items="${categories}" var="category">
+                <option value="${category.id}">${category.name}</option>
+            </c:forEach>
+        </select>
+    </div>
     <button>Create</button>
 </form>
 </body>

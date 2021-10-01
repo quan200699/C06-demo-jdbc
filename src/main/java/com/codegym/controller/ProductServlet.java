@@ -1,8 +1,11 @@
 package com.codegym.controller;
 
+import com.codegym.model.Category;
 import com.codegym.model.Product;
-import com.codegym.service.IProductService;
-import com.codegym.service.ProductService;
+import com.codegym.service.category.CategoryService;
+import com.codegym.service.category.ICategoryService;
+import com.codegym.service.product.IProductService;
+import com.codegym.service.product.ProductService;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -16,6 +19,7 @@ import java.util.List;
 @WebServlet(name = "ProductServlet", value = "/product")
 public class ProductServlet extends HttpServlet {
     private IProductService productService = new ProductService();
+    private ICategoryService categoryService = new CategoryService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -44,9 +48,9 @@ public class ProductServlet extends HttpServlet {
         int id = Integer.parseInt(request.getParameter("id"));
         Product oldProduct = productService.findById(id);
         RequestDispatcher dispatcher;
-        if (oldProduct == null){
+        if (oldProduct == null) {
             dispatcher = request.getRequestDispatcher("error-404.jsp");
-        }else {
+        } else {
             dispatcher = request.getRequestDispatcher("/product/delete.jsp");
             request.setAttribute("product", oldProduct);
         }
@@ -60,6 +64,8 @@ public class ProductServlet extends HttpServlet {
     private void showProductCreate(HttpServletRequest request, HttpServletResponse response) {
         RequestDispatcher dispatcher = request.getRequestDispatcher("/product/create.jsp");
         try {
+            List<Category> categories = categoryService.getAll();
+            request.setAttribute("categories", categories);
             dispatcher.forward(request, response);
         } catch (ServletException | IOException e) {
             e.printStackTrace();
@@ -71,9 +77,9 @@ public class ProductServlet extends HttpServlet {
         // = null => thì gọi hàm show list
         String name = request.getParameter("q");
         List<Product> products;
-        if (name == null || name.equals("")){
+        if (name == null || name.equals("")) {
             products = productService.getAll();
-        }else {
+        } else {
             products = productService.findProductByName(name);
         }
         RequestDispatcher dispatcher = request.getRequestDispatcher("/product/list.jsp");
@@ -96,7 +102,7 @@ public class ProductServlet extends HttpServlet {
                 addProduct(request, response);
                 break;
             }
-            case "delete":{
+            case "delete": {
                 deleteProduct(request, response);
                 break;
             }
@@ -118,7 +124,9 @@ public class ProductServlet extends HttpServlet {
         String description = request.getParameter("description");
         double price = Double.parseDouble(request.getParameter("price"));
         String image = request.getParameter("image");
+        int categoryId = Integer.parseInt(request.getParameter("category"));
         Product product = new Product(name, description, price, image);
+        product.setCategoryId(categoryId);
         boolean isCreated = productService.save(product);
         String message = "";
         if (isCreated) {
@@ -128,6 +136,8 @@ public class ProductServlet extends HttpServlet {
         }
         RequestDispatcher dispatcher = request.getRequestDispatcher("/product/create.jsp");
         request.setAttribute("message", message);
+        List<Category> categories = categoryService.getAll();
+        request.setAttribute("categories", categories);
         try {
             dispatcher.forward(request, response);
         } catch (ServletException | IOException e) {
