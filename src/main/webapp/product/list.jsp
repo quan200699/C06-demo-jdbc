@@ -22,6 +22,7 @@
         <td>Price</td>
         <td>Description</td>
         <td>Image</td>
+        <td>Delete</td>
     </tr>
     </thead>
     <tbody>
@@ -32,6 +33,7 @@
             <td>${product.price}</td>
             <td>${product.description}</td>
             <td><img src="${product.image}" alt="ava" height="100" width="100"></td>
+            <td><a href="/product?action=delete&id=${product.id}">Delete</a></td>
         </tr>
     </c:forEach>
     </tbody>

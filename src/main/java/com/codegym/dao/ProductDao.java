@@ -2,10 +2,7 @@ package com.codegym.dao;
 
 import com.codegym.model.Product;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,11 +54,34 @@ public class ProductDao implements IProductDao {
 
     @Override
     public boolean delete(int id) {
-        return false;
+        boolean isDeleted = false;
+        try {
+            CallableStatement callableStatement = connection.prepareCall("call delete_product_by_id(?)");
+            callableStatement.setInt(1, id);
+            isDeleted = callableStatement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return isDeleted;
     }
 
     @Override
     public Product findById(int id) {
-        return null;
+        Product product = new Product();
+        try {
+            PreparedStatement statement = connection.prepareStatement("select * from product where id = ?");
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                String name = resultSet.getString("name");
+                String description = resultSet.getString("description");
+                double price = resultSet.getDouble("price");
+                String image = resultSet.getString("image");
+                product = new Product(id, name, description, price, image);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return product;
     }
 }

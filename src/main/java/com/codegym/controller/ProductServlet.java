@@ -28,10 +28,32 @@ public class ProductServlet extends HttpServlet {
                 showProductCreate(request, response);
                 break;
             }
+            case "delete": {
+                showDeleteForm(request, response);
+                break;
+            }
             default: {
                 showProductList(request, response);
                 break;
             }
+        }
+    }
+
+    private void showDeleteForm(HttpServletRequest request, HttpServletResponse response) {
+        //localhost:8080?action=delete&id=1
+        int id = Integer.parseInt(request.getParameter("id"));
+        Product oldProduct = productService.findById(id);
+        RequestDispatcher dispatcher;
+        if (oldProduct == null){
+            dispatcher = request.getRequestDispatcher("error-404.jsp");
+        }else {
+            dispatcher = request.getRequestDispatcher("/product/delete.jsp");
+            request.setAttribute("product", oldProduct);
+        }
+        try {
+            dispatcher.forward(request, response);
+        } catch (ServletException | IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -66,6 +88,20 @@ public class ProductServlet extends HttpServlet {
                 addProduct(request, response);
                 break;
             }
+            case "delete":{
+                deleteProduct(request, response);
+                break;
+            }
+        }
+    }
+
+    private void deleteProduct(HttpServletRequest request, HttpServletResponse response) {
+        int id = Integer.parseInt(request.getParameter("id"));
+        productService.delete(id);
+        try {
+            response.sendRedirect("/product");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
