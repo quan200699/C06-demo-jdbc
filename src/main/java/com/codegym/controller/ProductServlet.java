@@ -1,9 +1,12 @@
 package com.codegym.controller;
 
 import com.codegym.model.Category;
+import com.codegym.model.Orders;
 import com.codegym.model.Product;
 import com.codegym.service.category.CategoryService;
 import com.codegym.service.category.ICategoryService;
+import com.codegym.service.orders.IOrderService;
+import com.codegym.service.orders.OrderService;
 import com.codegym.service.product.IProductService;
 import com.codegym.service.product.ProductService;
 
@@ -20,6 +23,7 @@ import java.util.List;
 public class ProductServlet extends HttpServlet {
     private IProductService productService = new ProductService();
     private ICategoryService categoryService = new CategoryService();
+    private IOrderService orderService = new OrderService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -36,11 +40,28 @@ public class ProductServlet extends HttpServlet {
                 showDeleteForm(request, response);
                 break;
             }
+            case "buy": {
+                showFormBuyProduct(request, response);
+                break;
+            }
             default: {
                 showProductList(request, response);
                 break;
             }
         }
+    }
+
+    private void showFormBuyProduct(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        Product currentProduct = productService.findById(id);
+        RequestDispatcher dispatcher;
+        if (currentProduct == null) {
+            dispatcher = request.getRequestDispatcher("error-404.jsp");
+        } else {
+            dispatcher = request.getRequestDispatcher("/product/buy.jsp");
+            request.setAttribute("product", currentProduct);
+        }
+        dispatcher.forward(request, response);
     }
 
     private void showDeleteForm(HttpServletRequest request, HttpServletResponse response) {
@@ -106,6 +127,30 @@ public class ProductServlet extends HttpServlet {
                 deleteProduct(request, response);
                 break;
             }
+            case "buy": {
+                buyProduct(request, response);
+                break;
+            }
+        }
+    }
+
+    private void buyProduct(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        int amount = Integer.parseInt(request.getParameter("amount"));
+        Product product = productService.findById(id);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/product/buy.jsp");
+        if (product.getAmount() < amount) {
+            request.setAttribute("message", "hết hàng");
+            dispatcher.forward(request, response);
+        } else {
+            Orders order = new Orders();
+            order.setAmount(amount);
+            order.setProductId(id);
+            orderService.save(order);
+            productService.updateProductAmountAfterUserBuy(id, product.getAmount() - amount);
+            request.setAttribute("message", "Mua thành công");
+            request.setAttribute("product", product);
+            dispatcher.forward(request, response);
         }
     }
 

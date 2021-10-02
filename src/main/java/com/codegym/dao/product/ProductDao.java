@@ -22,7 +22,8 @@ public class ProductDao implements IProductDao {
                 String description = resultSet.getString("description");
                 double price = resultSet.getDouble("price");
                 String image = resultSet.getString("image");
-                Product product = new Product(id, name, description, price, image);
+                int categoryId = resultSet.getInt("category_id");
+                Product product = new Product(id, name, description, price, image,categoryId);
                 products.add(product);
             }
         } catch (SQLException e) {
@@ -92,7 +93,9 @@ public class ProductDao implements IProductDao {
                 String description = resultSet.getString("description");
                 double price = resultSet.getDouble("price");
                 String image = resultSet.getString("image");
-                product = new Product(id, name, description, price, image);
+                int categoryId = resultSet.getInt("category_id");
+                int amount = resultSet.getInt("amount");
+                product = new Product(id, name, description, price, image, categoryId, amount);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -147,5 +150,20 @@ public class ProductDao implements IProductDao {
             e.printStackTrace();
         }
         return products;
+    }
+
+    @Override
+    public boolean updateProductAmountAfterUserBuy(int id, int amount) {
+        boolean isUpdated = false;
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement("update product set amount = ? where id = ?");
+            preparedStatement.setInt(1, amount);
+            preparedStatement.setInt(2, id);
+            isUpdated = preparedStatement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return isUpdated;
     }
 }

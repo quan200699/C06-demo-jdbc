@@ -28,7 +28,6 @@ public class CategoryDao implements ICategoryDao {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return categories;
     }
 
@@ -49,6 +48,19 @@ public class CategoryDao implements ICategoryDao {
 
     @Override
     public Category findById(int id) {
-        return null;
+        Category category = new Category();
+        try {
+            PreparedStatement statement = connection.prepareStatement("SELECT * from category where id = ?");
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                int id1 = resultSet.getInt("id");
+                String name = resultSet.getString("name");
+                category = new Category(id1, name);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return category;
     }
 }
