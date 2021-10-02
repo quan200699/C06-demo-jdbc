@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface IProductDao extends IGeneralDao<Product> {
     List<Product> findProductByName(String name);
+
+    List<Product> findProductByCategoryId(int categoryId);
 }

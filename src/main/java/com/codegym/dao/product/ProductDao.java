@@ -51,7 +51,20 @@ public class ProductDao implements IProductDao {
 
     @Override
     public boolean update(int id, Product product) {
-        return false;
+        boolean isUpdated = false;
+        try {
+            PreparedStatement statement = connection.prepareStatement("update product set name = ?, price = ?, image = ?, description = ? where id = ?");
+            statement.setString(1, product.getName());
+            statement.setDouble(2, product.getPrice());
+            statement.setString(3, product.getImage());
+            statement.setString(4, product.getDescription());
+            statement.setInt(5, product.getId());
+            isUpdated = statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return isUpdated;
     }
 
     @Override
@@ -105,6 +118,29 @@ public class ProductDao implements IProductDao {
                 double price = resultSet.getDouble("price");
                 String image = resultSet.getString("image");
                 Product product = new Product(id, name1, description, price, image);
+                products.add(product);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return products;
+    }
+
+    @Override
+    public List<Product> findProductByCategoryId(int categoryId) {
+        List<Product> products = new ArrayList<>();
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement("select * from product where category_id = ?");
+            preparedStatement.setInt(1, categoryId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next() == true) {
+                int id = resultSet.getInt("id");
+                String name = resultSet.getString("name");
+                String description = resultSet.getString("description");
+                double price = resultSet.getDouble("price");
+                String image = resultSet.getString("image");
+                int category = resultSet.getInt("category_id");
+                Product product = new Product(id, name, description, price, image, category);
                 products.add(product);
             }
         } catch (SQLException e) {

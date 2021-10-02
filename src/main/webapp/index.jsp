@@ -11,6 +11,6 @@
     <title>$Title$</title>
   </head>
   <body>
-  $END$
+  <a href="/product">Product Management</a> | <a href="/category">Category Management</a>
   </body>
 </html>
