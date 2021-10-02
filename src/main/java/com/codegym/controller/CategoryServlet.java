@@ -49,7 +49,7 @@ public class CategoryServlet extends HttpServlet {
         int categoryId = Integer.parseInt(request.getParameter("id"));
         List<Product> products = productService.findProductByCategoryId(categoryId);
         request.setAttribute("products",products);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/categorviewy/.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/category/view.jsp");
         dispatcher.forward(request, response);
     }
 
